@@ -90,11 +90,6 @@ async function fetchAllArticles(): Promise<Article[]> {
 export default async function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-black mb-2">
-          Latest Tech News
-        </h1>
-      </div>
       
       <Suspense fallback={
         <div className="space-y-6">
