@@ -17,7 +17,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
   }
 
   return (
-    <article className="border-b border-gray-100 py-6 first:pt-0 last:border-b-0 hover:bg-gray-50 transition-colors">
+    <article className="border-b border-gray-100 py-6 last:border-b-0 hover:bg-gray-50 transition-colors">
       <div className="flex gap-4">
         {article.thumbnail && (
           <div className="flex-shrink-0">
