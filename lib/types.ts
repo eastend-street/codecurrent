@@ -33,4 +33,3 @@ export interface RedditPost {
   thumbnail?: string
 }
 
-export type TabType = 'hackernews' | 'reddit'
