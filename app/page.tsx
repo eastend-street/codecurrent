@@ -94,9 +94,6 @@ export default async function Home() {
         <h1 className="text-3xl font-bold text-black mb-2">
           Latest Tech News
         </h1>
-        <p className="text-gray-600">
-          Top stories from Hacker News and Reddit tech communities
-        </p>
       </div>
       
       <Suspense fallback={
