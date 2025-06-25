@@ -1,5 +1,6 @@
 import { Article } from '@/lib/types'
 import ArticleCard from './ArticleCard'
+import FeaturedArticleCard from './FeaturedArticleCard'
 
 interface ArticleListProps {
   articles: Article[]
@@ -14,11 +15,25 @@ export default function ArticleList({ articles }: ArticleListProps) {
     )
   }
 
+  const [firstArticle, ...remainingArticles] = articles
+
   return (
-    <div className="space-y-0">
-      {articles.map((article) => (
-        <ArticleCard key={article.id} article={article} />
-      ))}
+    <div>
+      {/* Featured Article (only if it has a thumbnail) */}
+      {firstArticle.thumbnail ? (
+        <FeaturedArticleCard article={firstArticle} />
+      ) : (
+        <div className="space-y-0">
+          <ArticleCard article={firstArticle} />
+        </div>
+      )}
+      
+      {/* Regular Articles */}
+      <div className="space-y-0">
+        {remainingArticles.map((article) => (
+          <ArticleCard key={article.id} article={article} />
+        ))}
+      </div>
     </div>
   )
 }
