@@ -5,9 +5,11 @@ A modern tech news aggregator that brings together the best stories from Hacker 
 ## Features
 
 - **Dual Source Aggregation**: Fetches top stories from Hacker News and multiple tech-focused subreddits
-- **Clean Interface**: Medium-inspired design with focus on readability
-- **Tab Navigation**: Switch between Hacker News and Reddit content
-- **Responsive Design**: Works seamlessly across desktop and mobile devices
+- **Smart Article Thumbnails**: Automatically extracts Open Graph images from article URLs
+- **Featured Article Layout**: Hero-style layout for the top article with large imagery
+- **Responsive Mobile Design**: Optimized layouts for both mobile and desktop viewing
+- **Unified Feed**: Intelligent scoring system blends articles from both sources
+- **Clean Interface**: The Verge-inspired design with focus on readability
 - **External Links**: Articles open in new tabs to preserve your browsing session
 
 ## Tech Stack
@@ -19,8 +21,9 @@ A modern tech news aggregator that brings together the best stories from Hacker 
 
 ## Data Sources
 
-- **Hacker News**: Top 10 stories via Firebase API
-- **Reddit**: Tech-focused subreddits including r/programming, r/technology, r/webdev, and more
+- **Hacker News**: Top 15 stories via Firebase API
+- **Reddit**: Top 15 stories from tech-focused subreddits including r/programming, r/technology, r/webdev, r/MachineLearning, r/startups, and more
+- **Final Output**: Top 20 articles selected using normalized scoring algorithm that balances recency and engagement
 
 ## Getting Started
 
@@ -46,17 +49,17 @@ A modern tech news aggregator that brings together the best stories from Hacker 
 
 ```
 app/
-├── components/          # React components
-│   ├── ArticleCard.tsx # Individual article display
-│   ├── ArticleList.tsx # Article container
-│   ├── TabNavigation.tsx # Source switching
-│   ├── Header.tsx      # App header
-│   └── Footer.tsx      # App footer
-├── page.tsx            # Main page with data fetching
-└── layout.tsx          # Root layout
+├── components/              # React components
+│   ├── ArticleCard.tsx     # Regular article display
+│   ├── FeaturedArticleCard.tsx # Hero article layout
+│   ├── ArticleList.tsx     # Article container with featured logic
+│   ├── Header.tsx          # App header
+│   └── Footer.tsx          # App footer
+├── page.tsx                # Main page with data fetching
+└── layout.tsx              # Root layout
 lib/
-├── types.ts            # TypeScript definitions
-└── utils.ts            # Shared utilities
+├── types.ts                # TypeScript definitions
+└── thumbnail.ts            # Thumbnail extraction utilities
 ```
 
 ## Contributing
