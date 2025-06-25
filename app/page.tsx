@@ -104,7 +104,7 @@ async function fetchAllArticles(): Promise<Article[]> {
 
 export default async function Home() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 pt-4 pb-8">
       
       <Suspense fallback={
         <div className="space-y-6">
