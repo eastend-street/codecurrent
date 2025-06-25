@@ -7,6 +7,8 @@ export interface Article {
   timestamp: number
   description?: string
   source: 'hackernews' | 'reddit'
+  thumbnail?: string
+  thumbnailAlt?: string
 }
 
 export interface HackerNewsItem {
@@ -28,6 +30,7 @@ export interface RedditPost {
   created_utc: number
   selftext?: string
   subreddit: string
+  thumbnail?: string
 }
 
 export type TabType = 'hackernews' | 'reddit'

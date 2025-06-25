@@ -8,7 +8,7 @@ interface SearchParams {
 }
 
 interface HomeProps {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }
 
 async function fetchHackerNewsTop(): Promise<Article[]> {
@@ -74,7 +74,9 @@ async function fetchRedditTop(): Promise<Article[]> {
       author: post.author,
       timestamp: post.created_utc,
       description: post.selftext ? post.selftext.slice(0, 200) + '...' : undefined,
-      source: 'reddit' as const
+      source: 'reddit' as const,
+      thumbnail: post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' ? post.thumbnail : undefined,
+      thumbnailAlt: post.title
     }))
   } catch (error) {
     console.error('Failed to fetch Reddit:', error)
@@ -88,8 +90,9 @@ async function ArticleContent({ tab }: { tab: TabType }) {
   return <ArticleList articles={articles} />
 }
 
-export default function Home({ searchParams }: HomeProps) {
-  const activeTab: TabType = (searchParams.tab as TabType) || 'hackernews'
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams
+  const activeTab: TabType = (params.tab as TabType) || 'hackernews'
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
