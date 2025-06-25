@@ -68,7 +68,6 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             }>
               {article.source === 'hackernews' ? 'Hacker News' : 'Reddit'}
             </span>
-            <span>{article.score} points</span>
             <span>by {article.author}</span>
             <span>{formatDate(article.timestamp)}</span>
           </div>
