@@ -1,3 +1,5 @@
+'use client'
+
 import { Article } from '@/lib/types'
 import Image from 'next/image'
 
@@ -28,6 +30,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
+                target.parentElement!.style.display = 'none';
               }}
             />
           </div>
