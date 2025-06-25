@@ -9,7 +9,7 @@ async function fetchHackerNewsTop(): Promise<Article[]> {
     const topStoryIds = await topStoriesRes.json()
     
     const stories = await Promise.all(
-      topStoryIds.slice(0, 10).map(async (id: number) => {
+      topStoryIds.slice(0, 15).map(async (id: number) => {
         const storyRes = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
         return storyRes.json()
       })
@@ -61,7 +61,7 @@ async function fetchRedditTop(): Promise<Article[]> {
     const posts = allPosts.flat()
       .filter((post: RedditPost) => post && !post.url.includes('reddit.com/r/'))
       .sort((a: RedditPost, b: RedditPost) => b.score - a.score)
-      .slice(0, 10)
+      .slice(0, 15)
 
     // Identify posts that need thumbnail extraction
     const postsNeedingThumbnails = posts.filter(post => 
@@ -130,7 +130,7 @@ async function fetchAllArticles(): Promise<Article[]> {
   const allArticles = [...hackerNewsArticles, ...redditArticles]
   
   // Sort by normalized score to better mix the sources
-  return allArticles.sort((a, b) => calculateNormalizedScore(b) - calculateNormalizedScore(a))
+  return allArticles.sort((a, b) => calculateNormalizedScore(b) - calculateNormalizedScore(a)).slice(0, 20)
 }
 
 export default async function Home() {
