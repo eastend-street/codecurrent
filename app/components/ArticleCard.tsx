@@ -57,8 +57,8 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
               article.source === 'hackernews' 
-                ? 'bg-orange-100 text-orange-800' 
-                : 'bg-blue-100 text-blue-800'
+                ? 'bg-orange-100 text-orange-700' 
+                : 'bg-red-100 text-red-700'
             }`}>
               {article.source === 'hackernews' ? 'Hacker News' : 'Reddit'}
             </span>
