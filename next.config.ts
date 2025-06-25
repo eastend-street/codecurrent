@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.redditstatic.com',
       },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
     ],
   },
 };

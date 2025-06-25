@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { Article, HackerNewsItem, RedditPost } from '@/lib/types'
+import { extractThumbnails } from '@/lib/thumbnail'
 import ArticleList from './components/ArticleList'
 
 async function fetchHackerNewsTop(): Promise<Article[]> {
@@ -14,17 +15,22 @@ async function fetchHackerNewsTop(): Promise<Article[]> {
       })
     )
 
-    return stories
-      .filter((story: HackerNewsItem) => story && story.url)
-      .map((story: HackerNewsItem) => ({
-        id: story.id.toString(),
-        title: story.title,
-        url: story.url!,
-        score: story.score,
-        author: story.by,
-        timestamp: story.time,
-        source: 'hackernews' as const
-      }))
+    const validStories = stories.filter((story: HackerNewsItem) => story && story.url)
+    
+    // Extract thumbnails for all valid stories
+    const thumbnails = await extractThumbnails(validStories.map(story => ({ url: story.url! })))
+
+    return validStories.map((story: HackerNewsItem, index: number) => ({
+      id: story.id.toString(),
+      title: story.title,
+      url: story.url!,
+      score: story.score,
+      author: story.by,
+      timestamp: story.time,
+      source: 'hackernews' as const,
+      thumbnail: thumbnails[index]?.url,
+      thumbnailAlt: thumbnails[index]?.alt || story.title
+    }))
   } catch (error) {
     console.error('Failed to fetch Hacker News:', error)
     return []
@@ -57,18 +63,43 @@ async function fetchRedditTop(): Promise<Article[]> {
       .sort((a: RedditPost, b: RedditPost) => b.score - a.score)
       .slice(0, 10)
 
-    return posts.map((post: RedditPost) => ({
-      id: post.id,
-      title: post.title,
-      url: post.url,
-      score: post.score,
-      author: post.author,
-      timestamp: post.created_utc,
-      description: post.selftext ? post.selftext.slice(0, 200) + '...' : undefined,
-      source: 'reddit' as const,
-      thumbnail: post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' ? post.thumbnail : undefined,
-      thumbnailAlt: post.title
-    }))
+    // Identify posts that need thumbnail extraction
+    const postsNeedingThumbnails = posts.filter(post => 
+      !post.thumbnail || post.thumbnail === 'self' || post.thumbnail === 'default'
+    )
+    
+    // Extract thumbnails for posts that don't have them
+    const extractedThumbnails = postsNeedingThumbnails.length > 0 
+      ? await extractThumbnails(postsNeedingThumbnails.map(post => ({ url: post.url })))
+      : []
+
+    let thumbnailIndex = 0
+    return posts.map((post: RedditPost) => {
+      let thumbnail = post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' 
+        ? post.thumbnail 
+        : undefined
+      let thumbnailAlt = post.title
+
+      // If post didn't have a thumbnail, use extracted one
+      if (!thumbnail) {
+        const extracted = extractedThumbnails[thumbnailIndex++]
+        thumbnail = extracted?.url
+        thumbnailAlt = extracted?.alt || post.title
+      }
+
+      return {
+        id: post.id,
+        title: post.title,
+        url: post.url,
+        score: post.score,
+        author: post.author,
+        timestamp: post.created_utc,
+        description: post.selftext ? post.selftext.slice(0, 200) + '...' : undefined,
+        source: 'reddit' as const,
+        thumbnail,
+        thumbnailAlt
+      }
+    })
   } catch (error) {
     console.error('Failed to fetch Reddit:', error)
     return []
