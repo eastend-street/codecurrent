@@ -1,15 +1,6 @@
 import { Suspense } from 'react'
-import { Article, HackerNewsItem, RedditPost, TabType } from '@/lib/types'
-import TabNavigation from './components/TabNavigation'
+import { Article, HackerNewsItem, RedditPost } from '@/lib/types'
 import ArticleList from './components/ArticleList'
-
-interface SearchParams {
-  tab?: string
-}
-
-interface HomeProps {
-  searchParams: Promise<SearchParams>
-}
 
 async function fetchHackerNewsTop(): Promise<Article[]> {
   try {
@@ -53,7 +44,7 @@ async function fetchRedditTop(): Promise<Article[]> {
             }
           })
           const data = await res.json()
-          return data.data.children.map((child: any) => child.data)
+          return data.data.children.map((child: { data: RedditPost }) => child.data)
         } catch (error) {
           console.error(`Failed to fetch r/${subreddit}:`, error)
           return []
@@ -84,16 +75,19 @@ async function fetchRedditTop(): Promise<Article[]> {
   }
 }
 
-async function ArticleContent({ tab }: { tab: TabType }) {
-  const articles = tab === 'reddit' ? await fetchRedditTop() : await fetchHackerNewsTop()
+async function fetchAllArticles(): Promise<Article[]> {
+  const [hackerNewsArticles, redditArticles] = await Promise.all([
+    fetchHackerNewsTop(),
+    fetchRedditTop()
+  ])
   
-  return <ArticleList articles={articles} />
+  const allArticles = [...hackerNewsArticles, ...redditArticles]
+  
+  // Sort by score descending to mix the sources
+  return allArticles.sort((a, b) => b.score - a.score)
 }
 
-export default async function Home({ searchParams }: HomeProps) {
-  const params = await searchParams
-  const activeTab: TabType = (params.tab as TabType) || 'hackernews'
-
+export default async function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
@@ -104,12 +98,10 @@ export default async function Home({ searchParams }: HomeProps) {
           Top stories from Hacker News and Reddit tech communities
         </p>
       </div>
-
-      <TabNavigation activeTab={activeTab} />
       
       <Suspense fallback={
         <div className="space-y-6">
-          {Array.from({ length: 10 }).map((_, i) => (
+          {Array.from({ length: 20 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="h-6 bg-gray-200 rounded mb-2"></div>
               <div className="h-4 bg-gray-100 rounded mb-2"></div>
@@ -118,7 +110,7 @@ export default async function Home({ searchParams }: HomeProps) {
           ))}
         </div>
       }>
-        <ArticleContent tab={activeTab} />
+        <ArticleList articles={await fetchAllArticles()} />
       </Suspense>
     </div>
   )
