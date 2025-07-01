@@ -5,12 +5,16 @@ import ArticleList from './components/ArticleList'
 
 async function fetchHackerNewsTop(): Promise<Article[]> {
   try {
-    const topStoriesRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json')
+    const topStoriesRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json', {
+      next: { revalidate: 3600 } // Revalidate every hour
+    })
     const topStoryIds = await topStoriesRes.json()
     
     const stories = await Promise.all(
       topStoryIds.slice(0, 15).map(async (id: number) => {
-        const storyRes = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
+        const storyRes = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, {
+          next: { revalidate: 3600 } // Revalidate every hour
+        })
         return storyRes.json()
       })
     )
@@ -47,7 +51,8 @@ async function fetchRedditTop(): Promise<Article[]> {
           const res = await fetch(`https://www.reddit.com/r/${subreddit}/top.json?limit=5&t=day`, {
             headers: {
               'User-Agent': 'CodeCurrent/1.0'
-            }
+            },
+            next: { revalidate: 3600 } // Revalidate every hour
           })
           const data = await res.json()
           return data.data.children.map((child: { data: RedditPost }) => child.data)
