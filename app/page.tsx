@@ -1,135 +1,14 @@
 import { Suspense } from 'react'
-import { Article, HackerNewsItem, RedditPost } from '@/lib/types'
-import { extractThumbnails } from '@/lib/thumbnail'
+import { Article } from '@/lib/types'
 import ArticleList from './components/ArticleList'
-
-async function fetchHackerNewsTop(): Promise<Article[]> {
-  try {
-    const topStoriesRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json', {
-      next: { revalidate: 3600 } // Revalidate every hour
-    })
-    const topStoryIds = await topStoriesRes.json()
-    
-    const stories = await Promise.all(
-      topStoryIds.slice(0, 15).map(async (id: number) => {
-        const storyRes = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, {
-          next: { revalidate: 3600 } // Revalidate every hour
-        })
-        return storyRes.json()
-      })
-    )
-
-    const validStories = stories.filter((story: HackerNewsItem) => story && story.url)
-    
-    // Extract thumbnails for all valid stories
-    const thumbnails = await extractThumbnails(validStories.map(story => ({ url: story.url! })))
-
-    return validStories.map((story: HackerNewsItem, index: number) => ({
-      id: story.id.toString(),
-      title: story.title,
-      url: story.url!,
-      score: story.score,
-      author: story.by,
-      timestamp: story.time,
-      source: 'hackernews' as const,
-      thumbnail: thumbnails[index]?.url,
-      thumbnailAlt: thumbnails[index]?.alt || story.title
-    }))
-  } catch (error) {
-    console.error('Failed to fetch Hacker News:', error)
-    return []
-  }
-}
-
-async function fetchRedditTop(): Promise<Article[]> {
-  try {
-    const subreddits = ['programming', 'technology', 'webdev', 'MachineLearning', 'startups', 'ClaudeAI', 'ycombinator', 'cursor']
-    
-    const allPosts = await Promise.all(
-      subreddits.map(async (subreddit) => {
-        try {
-          const res = await fetch(`https://www.reddit.com/r/${subreddit}/top.json?limit=5&t=day`, {
-            headers: {
-              'User-Agent': 'CodeCurrent/1.0'
-            },
-            next: { revalidate: 3600 } // Revalidate every hour
-          })
-          const data = await res.json()
-          return data.data.children.map((child: { data: RedditPost }) => child.data)
-        } catch (error) {
-          console.error(`Failed to fetch r/${subreddit}:`, error)
-          return []
-        }
-      })
-    )
-
-    const posts = allPosts.flat()
-      .filter((post: RedditPost) => post && !post.url.includes('reddit.com/r/'))
-      .sort((a: RedditPost, b: RedditPost) => b.score - a.score)
-      .slice(0, 15)
-
-    // Identify posts that need thumbnail extraction
-    const postsNeedingThumbnails = posts.filter(post => 
-      !post.thumbnail || post.thumbnail === 'self' || post.thumbnail === 'default'
-    )
-    
-    // Extract thumbnails for posts that don't have them
-    const extractedThumbnails = postsNeedingThumbnails.length > 0 
-      ? await extractThumbnails(postsNeedingThumbnails.map(post => ({ url: post.url })))
-      : []
-
-    let thumbnailIndex = 0
-    return posts.map((post: RedditPost) => {
-      let thumbnail = post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' 
-        ? post.thumbnail 
-        : undefined
-      let thumbnailAlt = post.title
-
-      // If post didn't have a thumbnail, use extracted one
-      if (!thumbnail) {
-        const extracted = extractedThumbnails[thumbnailIndex++]
-        thumbnail = extracted?.url
-        thumbnailAlt = extracted?.alt || post.title
-      }
-
-      return {
-        id: post.id,
-        title: post.title,
-        url: post.url,
-        score: post.score,
-        author: post.author,
-        timestamp: post.created_utc,
-        description: post.selftext ? post.selftext.slice(0, 200) + '...' : undefined,
-        source: 'reddit' as const,
-        thumbnail,
-        thumbnailAlt
-      }
-    })
-  } catch (error) {
-    console.error('Failed to fetch Reddit:', error)
-    return []
-  }
-}
-
-function calculateNormalizedScore(article: Article): number {
-  // Logarithmic scaling to compress score differences
-  const logScore = Math.log10(Math.max(article.score, 1))
-  
-  // Different scaling factors based on typical score ranges
-  // HN: typically 50-500 points, Reddit: typically 1000-50000 points
-  const scalingFactor = article.source === 'hackernews' ? 3.5 : 1.0
-  
-  // Recency bonus: more recent articles get a small boost
-  const hoursOld = (Date.now() / 1000 - article.timestamp) / 3600
-  const recencyBonus = Math.max(0, 1 - hoursOld / 24) * 0.2 // 0.2 bonus that decays over 24 hours
-  
-  return logScore * scalingFactor + recencyBonus
-}
+import { getHackerNewsTop } from './queries/getHackerNewsTop'
+import { getRedditTop } from './queries/getRedditTop'
+import { calculateNormalizedScore } from './utils/scoring'
 
 async function fetchAllArticles(): Promise<Article[]> {
   const [hackerNewsArticles, redditArticles] = await Promise.all([
-    fetchHackerNewsTop(),
-    fetchRedditTop()
+    getHackerNewsTop(),
+    getRedditTop()
   ])
   
   const allArticles = [...hackerNewsArticles, ...redditArticles]
