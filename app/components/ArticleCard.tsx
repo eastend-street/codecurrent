@@ -61,9 +61,15 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           <span className={`px-2 py-1 rounded-full text-xs font-medium text-white`} style={
             article.source === 'hackernews' 
               ? { backgroundColor: '#FF6600' }
-              : { backgroundColor: '#FF4500' }
+              : article.source === 'reddit' 
+              ? { backgroundColor: '#FF4500' }
+              : { backgroundColor: '#6366F1' }
           }>
-            {article.source === 'hackernews' ? 'Hacker News' : 'Reddit'}
+            {article.source === 'hackernews' 
+              ? 'Hacker News' 
+              : article.source === 'reddit' 
+              ? 'Reddit' 
+              : article.blogName || 'Blog'}
           </span>
           <span>by {article.author}</span>
           <span>{formatDate(article.timestamp)}</span>
@@ -94,9 +100,15 @@ export default function ArticleCard({ article }: ArticleCardProps) {
             <span className={`px-2 py-1 rounded-full text-xs font-medium text-white`} style={
               article.source === 'hackernews' 
                 ? { backgroundColor: '#FF6600' }
-                : { backgroundColor: '#FF4500' }
+                : article.source === 'reddit' 
+                ? { backgroundColor: '#FF4500' }
+                : { backgroundColor: '#6366F1' }
             }>
-              {article.source === 'hackernews' ? 'Hacker News' : 'Reddit'}
+              {article.source === 'hackernews' 
+                ? 'Hacker News' 
+                : article.source === 'reddit' 
+                ? 'Reddit' 
+                : article.blogName || 'Blog'}
             </span>
             <span>by {article.author}</span>
             <span>{formatDate(article.timestamp)}</span>
