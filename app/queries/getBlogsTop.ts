@@ -32,8 +32,8 @@ export async function getBlogsTop(): Promise<Article[]> {
       .slice(0, 10)
     
     // Extract thumbnails for the posts
-    const urls = sortedPosts.map(({ post }) => post.link)
-    const thumbnails = await extractThumbnails(urls)
+    const urlObjects = sortedPosts.map(({ post }) => ({ url: post.link }))
+    const thumbnails = await extractThumbnails(urlObjects)
     
     // Convert to Article format
     const articles: Article[] = sortedPosts.map(({ post, blog }, index) => ({
