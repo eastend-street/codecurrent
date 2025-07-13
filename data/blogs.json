@@ -1,0 +1,137 @@
+{
+  "blogs": [
+    {
+      "name": "Dan Abramov's Blog",
+      "url": "https://overreacted.io",
+      "feedUrl": "https://overreacted.io/rss.xml",
+      "description": "Personal blog by Dan Abramov",
+      "category": "React/Frontend"
+    },
+    {
+      "name": "Vercel Blog",
+      "url": "https://vercel.com/blog",
+      "feedUrl": "https://vercel.com/blog/rss.xml",
+      "description": "Latest from Vercel",
+      "category": "DevOps/Frontend"
+    },
+    {
+      "name": "Kent C. Dodds Blog",
+      "url": "https://kentcdodds.com/blog",
+      "feedUrl": "https://kentcdodds.com/blog/rss.xml",
+      "description": "Teaching people to make the web better",
+      "category": "React/Testing"
+    },
+    {
+      "name": "Josh W Comeau",
+      "url": "https://www.joshwcomeau.com",
+      "feedUrl": "https://www.joshwcomeau.com/rss.xml",
+      "description": "Interactive blog about frontend development",
+      "category": "Frontend/CSS"
+    },
+    {
+      "name": "Martin Fowler",
+      "url": "https://martinfowler.com",
+      "feedUrl": "https://martinfowler.com/feed.atom",
+      "description": "Software development, design, and architecture",
+      "category": "Architecture/Backend"
+    },
+    {
+      "name": "GitHub Blog",
+      "url": "https://github.blog",
+      "feedUrl": "https://github.blog/feed/",
+      "description": "Updates, ideas, and inspiration from GitHub",
+      "category": "DevOps/General"
+    },
+    {
+      "name": "Netlify Blog",
+      "url": "https://www.netlify.com/blog",
+      "feedUrl": "https://www.netlify.com/blog/index.xml",
+      "description": "Web development and deployment insights",
+      "category": "DevOps/JAMstack"
+    },
+    {
+      "name": "Paul Graham",
+      "url": "http://paulgraham.com",
+      "feedUrl": "http://paulgraham.com/rss.html",
+      "description": "Essays on startups, programming, and more",
+      "category": "Startups/Essays"
+    },
+    {
+      "name": "Builder.io",
+      "url": "https://www.builder.io/blog",
+      "feedUrl": "https://www.builder.io/blog/rss.xml",
+      "description": "Visual development platform insights",
+      "category": "Frontend/Tools"
+    },
+    {
+      "name": "GraphQL Blog",
+      "url": "https://graphql.org/blog",
+      "feedUrl": "https://graphql.org/blog/rss.xml",
+      "description": "Official GraphQL blog",
+      "category": "Backend/API"
+    },
+    {
+      "name": "Pedro Duarte",
+      "url": "https://ordep.dev/posts/",
+      "feedUrl": "https://ordep.dev/posts/rss.xml",
+      "description": "Frontend development and design systems",
+      "category": "Frontend/Design"
+    },
+    {
+      "name": "Apollo GraphQL",
+      "url": "https://www.apollographql.com/blog",
+      "feedUrl": "https://www.apollographql.com/blog/rss.xml",
+      "description": "GraphQL platform and tools",
+      "category": "Backend/GraphQL"
+    },
+    {
+      "name": "Next.js Blog",
+      "url": "https://nextjs.org/blog",
+      "feedUrl": "https://nextjs.org/blog/feed.xml",
+      "description": "Official Next.js blog",
+      "category": "Frontend/React"
+    },
+    {
+      "name": "Shopify Engineering",
+      "url": "https://shopifyengineering.myshopify.com/blogs/engineering",
+      "feedUrl": "https://shopifyengineering.myshopify.com/blogs/engineering.atom",
+      "description": "Engineering insights from Shopify",
+      "category": "Engineering/Ecommerce"
+    },
+    {
+      "name": "Simon Willison",
+      "url": "https://simonwillison.net/",
+      "feedUrl": "https://simonwillison.net/atom/everything/",
+      "description": "Co-creator of Django, AI and data journalism",
+      "category": "AI/Data"
+    },
+    {
+      "name": "Max Schmitt",
+      "url": "https://spiess.dev/",
+      "feedUrl": "https://spiess.dev/rss.xml",
+      "description": "Frontend development and web technologies",
+      "category": "Frontend/Web"
+    },
+    {
+      "name": "Tidy First?",
+      "url": "https://tidyfirst.substack.com/",
+      "feedUrl": "https://tidyfirst.substack.com/feed",
+      "description": "Kent Beck on software design and refactoring",
+      "category": "Software Design"
+    },
+    {
+      "name": "The Pragmatic Engineer",
+      "url": "https://newsletter.pragmaticengineer.com/",
+      "feedUrl": "https://newsletter.pragmaticengineer.com/feed",
+      "description": "Gergely Orosz on engineering practices and tech industry",
+      "category": "Engineering/Industry"
+    },
+    {
+      "name": "Chamath Palihapitiya",
+      "url": "https://chamath.substack.com/",
+      "feedUrl": "https://chamath.substack.com/feed",
+      "description": "Tech investing and startup insights",
+      "category": "Investing/Startups"
+    }
+  ]
+}

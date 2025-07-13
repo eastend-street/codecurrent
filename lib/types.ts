@@ -6,7 +6,8 @@ export interface Article {
   author: string
   timestamp: number
   description?: string
-  source: 'hackernews' | 'reddit'
+  source: 'hackernews' | 'reddit' | 'blog'
+  blogName?: string
   thumbnail?: string
   thumbnailAlt?: string
 }
@@ -31,5 +32,22 @@ export interface RedditPost {
   selftext?: string
   subreddit: string
   thumbnail?: string
+}
+
+export interface BlogConfig {
+  name: string
+  url: string
+  feedUrl: string
+  description: string
+  category: string
+}
+
+export interface BlogPost {
+  title: string
+  link: string
+  description?: string
+  author?: string
+  pubDate?: string
+  content?: string
 }
 
