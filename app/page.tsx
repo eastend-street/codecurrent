@@ -4,9 +4,10 @@ import ArticleList from './components/ArticleList'
 import TabNavigation from './components/TabNavigation'
 import { getHackerNewsTop } from './queries/getHackerNewsTop'
 import { getRedditTop } from './queries/getRedditTop'
+import { getBlogsTop } from './queries/getBlogsTop'
 import { calculateNormalizedScore } from './utils/scoring'
 
-async function fetchArticles(tab: 'all' | 'hackernews' | 'reddit'): Promise<Article[]> {
+async function fetchArticles(tab: 'all' | 'hackernews' | 'reddit' | 'blogs'): Promise<Article[]> {
   if (tab === 'hackernews') {
     const articles = await getHackerNewsTop()
     return articles.slice(0, 20)
@@ -15,6 +16,11 @@ async function fetchArticles(tab: 'all' | 'hackernews' | 'reddit'): Promise<Arti
   if (tab === 'reddit') {
     const articles = await getRedditTop()
     return articles.slice(0, 20)
+  }
+  
+  if (tab === 'blogs') {
+    const articles = await getBlogsTop()
+    return articles.slice(0, 10) // Only 10 for blogs
   }
   
   // tab === 'all'
@@ -34,7 +40,7 @@ interface HomeProps {
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  const tab = (searchParams.tab === 'hackernews' || searchParams.tab === 'reddit') 
+  const tab = (searchParams.tab === 'hackernews' || searchParams.tab === 'reddit' || searchParams.tab === 'blogs') 
     ? searchParams.tab 
     : 'all'
   
