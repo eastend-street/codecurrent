@@ -23,7 +23,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
       {firstArticle.thumbnail ? (
         <FeaturedArticleCard article={firstArticle} />
       ) : (
-        <div className="space-y-0">
+        <div className="[&>article]:!border-b [&>article]:!border-gray-100">
           <ArticleCard article={firstArticle} />
         </div>
       )}
