@@ -36,12 +36,13 @@ async function fetchArticles(tab: 'all' | 'hackernews' | 'reddit' | 'blogs'): Pr
 }
 
 interface HomeProps {
-  searchParams: { tab?: string }
+  searchParams: Promise<{ tab?: string }>
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  const tab = (searchParams.tab === 'hackernews' || searchParams.tab === 'reddit' || searchParams.tab === 'blogs') 
-    ? searchParams.tab 
+  const resolvedSearchParams = await searchParams
+  const tab = (resolvedSearchParams.tab === 'hackernews' || resolvedSearchParams.tab === 'reddit' || resolvedSearchParams.tab === 'blogs') 
+    ? resolvedSearchParams.tab 
     : 'all'
   
   return (
