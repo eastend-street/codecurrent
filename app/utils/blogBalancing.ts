@@ -30,6 +30,56 @@ export const DEFAULT_BLOG_BALANCE_CONFIG: BlogBalanceConfig = {
 };
 
 /**
+ * Validates blog balance configuration and returns a normalized config
+ */
+export function validateBlogBalanceConfig(
+  config: Partial<BlogBalanceConfig> = {}
+): BlogBalanceConfig {
+  const validatedConfig: BlogBalanceConfig = {
+    ...DEFAULT_BLOG_BALANCE_CONFIG,
+    ...config,
+  };
+
+  // Validate maxArticlesPerBlog
+  if (!Number.isInteger(validatedConfig.maxArticlesPerBlog) || validatedConfig.maxArticlesPerBlog < 1) {
+    console.warn(
+      'maxArticlesPerBlog must be a positive integer, using default:',
+      DEFAULT_BLOG_BALANCE_CONFIG.maxArticlesPerBlog
+    );
+    validatedConfig.maxArticlesPerBlog = DEFAULT_BLOG_BALANCE_CONFIG.maxArticlesPerBlog;
+  }
+
+  // Validate totalArticles
+  if (!Number.isInteger(validatedConfig.totalArticles) || validatedConfig.totalArticles < 1) {
+    console.warn(
+      'totalArticles must be a positive integer, using default:',
+      DEFAULT_BLOG_BALANCE_CONFIG.totalArticles
+    );
+    validatedConfig.totalArticles = DEFAULT_BLOG_BALANCE_CONFIG.totalArticles;
+  }
+
+  // Validate fallbackToChronological
+  if (typeof validatedConfig.fallbackToChronological !== 'boolean') {
+    console.warn(
+      'fallbackToChronological must be a boolean, using default:',
+      DEFAULT_BLOG_BALANCE_CONFIG.fallbackToChronological
+    );
+    validatedConfig.fallbackToChronological = DEFAULT_BLOG_BALANCE_CONFIG.fallbackToChronological;
+  }
+
+  // Ensure maxArticlesPerBlog doesn't exceed totalArticles
+  if (validatedConfig.maxArticlesPerBlog > validatedConfig.totalArticles) {
+    console.warn(
+      'maxArticlesPerBlog cannot exceed totalArticles, adjusting maxArticlesPerBlog to:',
+      validatedConfig.totalArticles
+    );
+    validatedConfig.maxArticlesPerBlog = validatedConfig.totalArticles;
+  }
+
+  return validatedConfig;
+}
+
+/**
  * Groups articles by blog name, sorting each group chronologically (newest first)
  */
 function groupArticlesByBlog(articles: Article[]): BlogArticleGroup[] {
@@ -55,15 +105,17 @@ function groupArticlesByBlog(articles: Article[]): BlogArticleGroup[] {
  */
 export function balanceArticleSelection(
   articles: Article[],
-  config: BlogBalanceConfig = DEFAULT_BLOG_BALANCE_CONFIG
+  config: Partial<BlogBalanceConfig> = DEFAULT_BLOG_BALANCE_CONFIG
 ): Article[] {
   try {
+    // Validate and normalize configuration
+    const validatedConfig = validateBlogBalanceConfig(config);
     // Handle edge cases
     if (articles.length === 0) {
       return [];
     }
 
-    if (articles.length <= config.totalArticles) {
+    if (articles.length <= validatedConfig.totalArticles) {
       // If we have fewer articles than requested, return all sorted chronologically
       return articles.sort((a, b) => b.timestamp - a.timestamp);
     }
@@ -75,7 +127,7 @@ export function balanceArticleSelection(
     if (blogGroups.length === 1) {
       const singleGroup = blogGroups[0];
       return singleGroup.articles
-        .slice(0, Math.min(config.totalArticles, config.maxArticlesPerBlog))
+        .slice(0, Math.min(validatedConfig.totalArticles, validatedConfig.maxArticlesPerBlog))
         .sort((a, b) => b.timestamp - a.timestamp);
     }
 
@@ -89,16 +141,16 @@ export function balanceArticleSelection(
 
     // Continue round-robin until we have enough articles or exhaust all sources
     while (
-      selectedArticles.length < config.totalArticles &&
+      selectedArticles.length < validatedConfig.totalArticles &&
       blogQueues.some((queue) => queue.articles.length > 0)
     ) {
       // Process each queue in round-robin fashion using forEach
       blogQueues.forEach((queue) => {
         // Skip if this blog has reached its quota, has no more articles, or we've hit the limit
         if (
-          queue.selectedCount >= config.maxArticlesPerBlog ||
+          queue.selectedCount >= validatedConfig.maxArticlesPerBlog ||
           queue.articles.length === 0 ||
-          selectedArticles.length >= config.totalArticles
+          selectedArticles.length >= validatedConfig.totalArticles
         ) {
           return; // Continue to next queue
         }
@@ -118,10 +170,13 @@ export function balanceArticleSelection(
       error
     );
 
-    if (config.fallbackToChronological) {
+    // Validate config for fallback behavior
+    const validatedConfig = validateBlogBalanceConfig(config);
+    
+    if (validatedConfig.fallbackToChronological) {
       return articles
         .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, config.totalArticles);
+        .slice(0, validatedConfig.totalArticles);
     }
 
     return [];
