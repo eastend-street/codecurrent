@@ -2,6 +2,7 @@ import { Article, BlogConfig } from '@/lib/types'
 import { parseRSSFeed } from '@/lib/rss-parser'
 import { extractThumbnails } from '@/lib/thumbnail'
 import blogsConfig from '@/data/blogs.json'
+import { balanceArticleSelection } from '@/app/utils/blogBalancing'
 
 export async function getBlogsTop(): Promise<Article[]> {
   try {
@@ -21,36 +22,41 @@ export async function getBlogsTop(): Promise<Article[]> {
     const allBlogResults = await Promise.all(blogPromises)
     const allPosts = allBlogResults.flat()
     
-    // Sort by publication date and take top 10
-    const sortedPosts = allPosts
-      .filter(({ post }) => post.pubDate)
-      .sort((a, b) => {
-        const dateA = new Date(a.post.pubDate || 0).getTime()
-        const dateB = new Date(b.post.pubDate || 0).getTime()
-        return dateB - dateA // Most recent first
-      })
-      .slice(0, 10)
-    
-    // Extract thumbnails for the posts
-    const urlObjects = sortedPosts.map(({ post }) => ({ url: post.link }))
-    const thumbnails = await extractThumbnails(urlObjects)
-    
     // Convert to Article format
-    const articles: Article[] = sortedPosts.map(({ post, blog }, index) => ({
-      id: `blog-${blog.name}-${post.link}`,
-      title: post.title,
-      url: post.link,
-      score: 0, // Blogs don't have scores, we'll sort by date
-      author: post.author || 'Unknown',
-      timestamp: Math.floor(new Date(post.pubDate || 0).getTime() / 1000),
-      description: undefined, // Don't show descriptions for blog articles
-      source: 'blog' as const,
-      blogName: blog.name,
+    const articles: Article[] = allPosts
+      .filter(({ post }) => post.pubDate)
+      .map(({ post, blog }) => ({
+        id: `blog-${blog.name}-${post.link}`,
+        title: post.title,
+        url: post.link,
+        score: 0, // Blogs don't have scores, we'll sort by date
+        author: post.author || 'Unknown',
+        timestamp: Math.floor(new Date(post.pubDate || 0).getTime() / 1000),
+        description: undefined, // Don't show descriptions for blog articles
+        source: 'blog' as const,
+        blogName: blog.name,
+        thumbnail: undefined, // Placeholder for thumbnail
+        thumbnailAlt: undefined,
+      }));
+
+    // Balance the articles to ensure diversity
+    const balancedArticles = balanceArticleSelection(articles, {
+      maxArticlesPerBlog: 3,
+      totalArticles: 10,
+    });
+
+    // Extract thumbnails for the balanced posts
+    const urlObjects = balancedArticles.map((article) => ({ url: article.url }))
+    const thumbnails = await extractThumbnails(urlObjects)
+
+    // Add thumbnails to the balanced articles
+    const finalArticles = balancedArticles.map((article, index) => ({
+      ...article,
       thumbnail: thumbnails[index]?.url,
-      thumbnailAlt: thumbnails[index]?.alt
-    }))
+      thumbnailAlt: thumbnails[index]?.alt,
+    }));
     
-    return articles
+    return finalArticles
   } catch (error) {
     console.error('Error fetching blog articles:', error)
     return []
